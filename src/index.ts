@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import targetRoutes from './routes/target';
+import { restoreMonitoringFromDatabase } from './services/TargetService';
 
 dotenv.config();
 const app = express();
@@ -16,4 +17,5 @@ app.use('/targets', targetRoutes);
 
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);
+  restoreMonitoringFromDatabase();
 });
