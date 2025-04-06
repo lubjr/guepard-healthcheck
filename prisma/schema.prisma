@@ -1,0 +1,26 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Target {
+  id            String         @id @default(uuid())
+  name          String
+  url           String
+  checkInterval Int
+  statusEntries StatusEntry[]
+}
+
+model StatusEntry {
+  id           String   @id @default(uuid())
+  online       Boolean
+  statusCode   Int?
+  responseTime Int?
+  checkedAt    DateTime @default(now())
+  targetId     String
+  target       Target   @relation(fields: [targetId], references: [id])
+}
