@@ -9,7 +9,7 @@ app.use(express.json());
 const PORT = process.env.PORT;
 
 app.get('/', (req, res) => {
-  res.send('🚀 Health Check API is running!');
+  res.send('🚀 Guepard Health Check API is running!');
 });
 
 app.use('/targets', targetRoutes);
