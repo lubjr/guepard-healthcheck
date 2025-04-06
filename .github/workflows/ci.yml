@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
 
 jobs:
-  lint-check:
+  lint_and_prettier:
     name: Lint and Prettier
     runs-on: ubuntu-latest
 
