@@ -30,4 +30,17 @@ const listTargets: RequestHandler = (req, res): void => {
 
 router.get('/list', listTargets);
 
+const getStatus: RequestHandler = (req, res): void => {
+  const target = TargetService.getById(req.params.id);
+
+  if (!target) {
+    res.status(404).json({ error: 'Target not found' });
+    return;
+  }
+  
+  res.json(target.lastStatus || { message: 'Not checked yet' });
+};
+
+router.get('/:id/status', getStatus);
+
 export default router;
