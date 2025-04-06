@@ -1,4 +1,4 @@
-import { Target } from '../types/Target';
+import { StatusEntry, Target } from '../types/Target';
 import { randomUUID } from 'crypto';
 import axios from 'axios';
 import cron from 'node-cron';
@@ -20,25 +20,34 @@ function startMonitoring(target: Target) {
   const job = cron.schedule(cronExpr, async () => {
     const start = Date.now();
 
+    const newStatus: StatusEntry = {
+      online: false,
+      statusCode: null,
+      responseTime: null,
+      checkedAt: new Date().toISOString()
+    };
+
     try {
       const res = await axios.get(target.url, { timeout: 5000 });
-      const responseTime = Date.now() - start;
-
-      target.lastStatus = {
-        online: true,
-        statusCode: res.status,
-        responseTime,
-        checkedAt: new Date().toISOString(),
-      };
+      newStatus.online = true;
+      newStatus.statusCode = res.status;
+      newStatus.responseTime = Date.now() - start;
     } catch (err: any) {
-      const responseTime = Date.now() - start;
+      newStatus.online = false;
+      newStatus.statusCode = err?.response?.status ?? null;
+      newStatus.responseTime = Date.now() - start;
+    }
 
-      target.lastStatus = {
-        online: false,
-        statusCode: err?.response?.status ?? null,
-        responseTime,
-        checkedAt: new Date().toISOString(),
-      };
+    target.lastStatus = newStatus;
+
+    if (!target.statusHistory) {
+      target.statusHistory = [];
+    }
+
+    target.statusHistory.unshift(newStatus);
+
+    if (target.statusHistory.length > 10) {
+      target.statusHistory.pop();
     }
   });
 
