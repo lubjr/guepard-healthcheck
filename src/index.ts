@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import targetRoutes from './routes/target';
 
 dotenv.config();
 const app = express();
@@ -10,6 +11,8 @@ const PORT = process.env.PORT;
 app.get('/', (req, res) => {
   res.send('🚀 Health Check API is running!');
 });
+
+app.use('/targets', targetRoutes);
 
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);
