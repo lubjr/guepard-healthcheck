@@ -22,7 +22,7 @@ Esse modulo do Guepard é uma API que fornece dados atuais de um endpoint cadast
 Próximos passos:
 
 - Melhorar o controle e a gestão dos jobs
-- Autenticação de endpoint
+- Autenticação JWT
 - Implementar testes automatizados
 - Adicionar alertas e notificações
 - Documentar a API
