@@ -6,6 +6,12 @@ import cron from 'node-cron';
 const targets: Target[] = [];
 const jobs: Map<string, cron.ScheduledTask> = new Map();
 
+export function calculateUptime(history: StatusEntry[]): number {
+  if (history.length === 0) return 0;
+  const onlineCount = history.filter(h => h.online).length;
+  return Math.round((onlineCount / history.length) * 100);
+}
+
 function secondsToCron(interval: number): string {
   if (interval < 60) {
     return `*/${interval} * * * * *`;

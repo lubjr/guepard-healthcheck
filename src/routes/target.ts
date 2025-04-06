@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { RequestHandler } from 'express';
-import { TargetService } from '../services/TargetService';
+import { TargetService, calculateUptime } from '../services/TargetService';
 
 const router = Router();
 
@@ -55,5 +55,23 @@ const getHistory: RequestHandler = (req, res): void => {
 };
 
 router.get('/:id/history', getHistory);
+
+const getUptime: RequestHandler = (req, res): void => {
+  const target = TargetService.getById(req.params.id);
+  
+  if (!target || !target.statusHistory) {
+    res.status(404).json({ error: 'Target not found or no history' });
+    return;
+  }
+
+  const uptimePercent = calculateUptime(target.statusHistory);
+
+  res.json({
+    uptimePercent,
+    totalChecks: target.statusHistory.length
+  });
+};
+
+router.get('/:id/uptime', getUptime);
 
 export default router;
