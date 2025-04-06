@@ -22,5 +22,8 @@ Esse modulo do Guepard é uma API que fornece dados atuais de um endpoint cadast
 
 Próximos passos:
 
-- Persistir em banco de dados
-- Adicionamos alertas (e-mail, Discord)
+- Melhorar o controle e a gestão dos jobs
+- Implementar testes automatizados
+- Adicionar alertas e notificações
+- Documentar a API
+- Git hub actions para deploy
