@@ -1,15 +1,15 @@
-# Dependências
+# Dependencies
 node_modules
 .pnpm-store
 
-# Arquivos de ambiente
+# Environment files
 .env
 .env.local
 .env.development
 .env.test
 .env.production
 
-# Arquivos de build
+# Build files
 dist
 build
 *.tsbuildinfo
@@ -22,11 +22,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Arquivos do sistema operacional
+# Operating System files
 .DS_Store
 Thumbs.db
 
-# Arquivos de IDE/editores
+# IDE/Editor files
 .idea
 .vscode/*
 !.vscode/extensions.json
@@ -34,14 +34,14 @@ Thumbs.db
 !.vscode/tasks.json
 !.vscode/launch.json
 
-# Arquivos de cache
+# Cache files
 .cache
 .eslintcache
 .stylelintcache
 
-# Arquivos de cobertura de testes
+# Test coverage files
 coverage
 
-# Arquivos temporários
+# Temporary files
 tmp
 temp
