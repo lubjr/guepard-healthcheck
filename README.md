@@ -13,7 +13,6 @@ Esse modulo do Guepard é uma API que fornece dados atuais de um endpoint cadast
 - `/targets/:id/history`
 - `/targets/:id/uptime`
 
-
 <h3>🧻 Visualização</h3>
 
 ![Preview](https://github.com/user-attachments/assets/c5a2bd75-c571-4864-96b4-c02ae498ad2d)
@@ -23,6 +22,7 @@ Esse modulo do Guepard é uma API que fornece dados atuais de um endpoint cadast
 Próximos passos:
 
 - Melhorar o controle e a gestão dos jobs
+- Autenticação de endpoint
 - Implementar testes automatizados
 - Adicionar alertas e notificações
 - Documentar a API
