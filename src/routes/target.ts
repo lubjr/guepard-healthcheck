@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { RequestHandler } from 'express';
-import { TargetService } from '../services/TargetService';
+import { TargetService } from '../services/targetService';
 
 const router = Router();
 
@@ -20,7 +20,8 @@ const createTarget: RequestHandler = async (req, res): Promise<void> => {
   try {
     const target = await TargetService.create({ name, url, checkInterval });
     res.status(201).json(target);
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error('Error creating target:', error);
     res.status(500).json({ error: 'Error creating target' });
   }
 };
@@ -42,7 +43,7 @@ const getStatus: RequestHandler = async (req, res): Promise<void> => {
   }
 
   const sortedEntries = target.statusEntries.sort(
-    (a, b) => new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime()
+    (a, b) => new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime(),
   );
   const lastStatus = sortedEntries[0] || null;
 
@@ -60,7 +61,7 @@ const getHistory: RequestHandler = async (req, res): Promise<void> => {
   }
 
   const history = target.statusEntries.sort(
-    (a, b) => new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime()
+    (a, b) => new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime(),
   );
 
   res.json(history);

@@ -1,5 +1,6 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import cron from 'node-cron';
+import type { StatusEntry } from '../types/Target';
 
 import { PrismaClient } from '@prisma/client';
 
@@ -20,7 +21,7 @@ function startMonitoring(targetId: string, url: string, interval: number) {
 
   const job = cron.schedule(cronExpr, async () => {
     const start = Date.now();
-    let newStatus: any = {
+    const newStatus: Omit<StatusEntry, 'checkedAt'> = {
       online: false,
       statusCode: null,
       responseTime: null,
@@ -31,9 +32,10 @@ function startMonitoring(targetId: string, url: string, interval: number) {
       newStatus.online = true;
       newStatus.statusCode = res.status;
       newStatus.responseTime = Date.now() - start;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as AxiosError;
       newStatus.online = false;
-      newStatus.statusCode = err?.response?.status ?? null;
+      newStatus.statusCode = error?.response?.status ?? null;
       newStatus.responseTime = Date.now() - start;
     }
 
@@ -83,9 +85,7 @@ export async function restoreMonitoringFromDatabase() {
   for (const target of targets) {
     startMonitoring(target.id, target.url, target.checkInterval);
 
-    console.log(
-      `✅ [${target.name}] Monitorando ${target.url} a cada ${target.checkInterval}s`
-    );
+    console.log(`✅ [${target.name}] Monitorando ${target.url} a cada ${target.checkInterval}s`);
   }
 
   console.log('\n✅ Monitoramento restaurado com sucesso!\n');
