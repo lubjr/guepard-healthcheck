@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import type { RequestHandler } from 'express';
-import { TargetService, calculateUptime } from '../services/TargetService';
+import { TargetService } from '../services/TargetService';
 
 const router = Router();
 
-const createTarget: RequestHandler = (req, res): void => {
+const createTarget: RequestHandler = async (req, res): Promise<void> => {
   const { name, url, checkInterval } = req.body;
 
   if (!name || !url || !checkInterval) {
@@ -17,59 +17,74 @@ const createTarget: RequestHandler = (req, res): void => {
     return;
   }
 
-  const target = TargetService.create({ name, url, checkInterval });
-  res.status(201).json(target);
+  try {
+    const target = await TargetService.create({ name, url, checkInterval });
+    res.status(201).json(target);
+  } catch (error) {
+    res.status(500).json({ error: 'Error creating target' });
+  }
 };
 
 router.post('/create', createTarget);
 
-const listTargets: RequestHandler = (req, res): void => {
-  const targets = TargetService.list();
+const listTargets: RequestHandler = async (req, res): Promise<void> => {
+  const targets = await TargetService.list();
   res.json(targets);
 };
 
 router.get('/list', listTargets);
 
-const getStatus: RequestHandler = (req, res): void => {
-  const target = TargetService.getById(req.params.id);
-
+const getStatus: RequestHandler = async (req, res): Promise<void> => {
+  const target = await TargetService.getById(req.params.id);
   if (!target) {
     res.status(404).json({ error: 'Target not found' });
     return;
   }
 
-  res.json(target.lastStatus || { message: 'Not checked yet' });
+  const sortedEntries = target.statusEntries.sort(
+    (a, b) => new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime()
+  );
+  const lastStatus = sortedEntries[0] || null;
+
+  res.json(lastStatus);
 };
 
 router.get('/:id/status', getStatus);
 
-const getHistory: RequestHandler = (req, res): void => {
-  const target = TargetService.getById(req.params.id);
+const getHistory: RequestHandler = async (req, res): Promise<void> => {
+  const target = await TargetService.getById(req.params.id);
 
   if (!target) {
     res.status(404).json({ error: 'Target not found' });
     return;
   }
 
-  res.json(target.statusHistory || []);
+  const history = target.statusEntries.sort(
+    (a, b) => new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime()
+  );
+
+  res.json(history);
 };
 
 router.get('/:id/history', getHistory);
 
-const getUptime: RequestHandler = (req, res): void => {
-  const target = TargetService.getById(req.params.id);
-  
-  if (!target || !target.statusHistory) {
-    res.status(404).json({ error: 'Target not found or no history' });
+const getUptime: RequestHandler = async (req, res): Promise<void> => {
+  const target = await TargetService.getById(req.params.id);
+  if (!target) {
+    res.status(404).json({ error: 'Target not found' });
     return;
   }
 
-  const uptimePercent = calculateUptime(target.statusHistory);
+  const totalChecks = target.statusEntries.length;
+  if (totalChecks === 0) {
+    res.json({ uptime: 0, totalChecks });
+    return;
+  }
 
-  res.json({
-    uptimePercent,
-    totalChecks: target.statusHistory.length
-  });
+  const onlineCount = target.statusEntries.filter((entry) => entry.online).length;
+  const uptimePercent = Math.round((onlineCount / totalChecks) * 100);
+
+  res.json({ uptime: uptimePercent, totalChecks });
 };
 
 router.get('/:id/uptime', getUptime);

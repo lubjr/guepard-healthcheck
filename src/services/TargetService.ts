@@ -1,16 +1,11 @@
-import { StatusEntry, Target } from '../types/Target';
-import { randomUUID } from 'crypto';
 import axios from 'axios';
 import cron from 'node-cron';
 
-const targets: Target[] = [];
-const jobs: Map<string, cron.ScheduledTask> = new Map();
+import { PrismaClient } from '@prisma/client';
 
-export function calculateUptime(history: StatusEntry[]): number {
-  if (history.length === 0) return 0;
-  const onlineCount = history.filter(h => h.online).length;
-  return Math.round((onlineCount / history.length) * 100);
-}
+const prisma = new PrismaClient();
+
+const jobs: Map<string, cron.ScheduledTask> = new Map();
 
 function secondsToCron(interval: number): string {
   if (interval < 60) {
@@ -20,21 +15,19 @@ function secondsToCron(interval: number): string {
   return `*/${minutes} * * * *`;
 }
 
-function startMonitoring(target: Target) {
-  const cronExpr = secondsToCron(target.checkInterval);
+function startMonitoring(targetId: string, url: string, interval: number) {
+  const cronExpr = secondsToCron(interval);
 
   const job = cron.schedule(cronExpr, async () => {
     const start = Date.now();
-
-    const newStatus: StatusEntry = {
+    let newStatus: any = {
       online: false,
       statusCode: null,
       responseTime: null,
-      checkedAt: new Date().toISOString()
     };
 
     try {
-      const res = await axios.get(target.url, { timeout: 5000 });
+      const res = await axios.get(url, { timeout: 5000 });
       newStatus.online = true;
       newStatus.statusCode = res.status;
       newStatus.responseTime = Date.now() - start;
@@ -44,40 +37,62 @@ function startMonitoring(target: Target) {
       newStatus.responseTime = Date.now() - start;
     }
 
-    target.lastStatus = newStatus;
+    await prisma.statusEntry.create({
+      data: {
+        online: newStatus.online,
+        statusCode: newStatus.statusCode,
+        responseTime: newStatus.responseTime,
+        target: { connect: { id: targetId } },
+      },
+    });
 
-    if (!target.statusHistory) {
-      target.statusHistory = [];
-    }
+    const count = await prisma.statusEntry.count({
+      where: { targetId },
+    });
 
-    target.statusHistory.unshift(newStatus);
+    if (count > 10) {
+      const excess = count - 10;
 
-    if (target.statusHistory.length > 10) {
-      target.statusHistory.pop();
+      const oldEntries = await prisma.statusEntry.findMany({
+        where: { targetId },
+        orderBy: { checkedAt: 'asc' },
+        take: excess,
+      });
+
+      const idsToDelete = oldEntries.map((entry) => entry.id);
+
+      await prisma.statusEntry.deleteMany({
+        where: { id: { in: idsToDelete } },
+      });
     }
   });
 
-  jobs.set(target.id, job);
+  jobs.set(targetId, job);
 }
 
 export const TargetService = {
-  create(data: Omit<Target, 'id' | 'lastStatus'>): Target {
-    const newTarget: Target = {
-      id: randomUUID(),
-      ...data,
-    };
+  async create(data: { name: string; url: string; checkInterval: number }) {
+    const newTarget = await prisma.target.create({
+      data: {
+        name: data.name,
+        url: data.url,
+        checkInterval: data.checkInterval,
+      },
+    });
 
-    targets.push(newTarget);
-    startMonitoring(newTarget);
+    startMonitoring(newTarget.id, newTarget.url, newTarget.checkInterval);
 
     return newTarget;
   },
 
-  list(): Target[] {
-    return targets;
+  async list() {
+    return await prisma.target.findMany();
   },
 
-  getById(id: string): Target | undefined {
-    return targets.find(t => t.id === id);
-  }
+  async getById(id: string) {
+    return await prisma.target.findUnique({
+      where: { id },
+      include: { statusEntries: true },
+    });
+  },
 };
