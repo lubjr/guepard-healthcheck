@@ -1,10 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import cron from 'node-cron';
-import type { StatusEntry } from '../types/Target';
-
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import type { StatusEntry } from '../types/types';
+import prisma from '../../db/prisma';
 
 const jobs: Map<string, cron.ScheduledTask> = new Map();
 
@@ -72,48 +69,4 @@ function startMonitoring(targetId: string, url: string, interval: number) {
   jobs.set(targetId, job);
 }
 
-export async function restoreMonitoringFromDatabase() {
-  const targets = await prisma.target.findMany();
-
-  if (targets.length === 0) {
-    console.log('[MONITOR] Nenhum target encontrado no banco.');
-    return;
-  }
-
-  console.log(`\n🔁 Restaurando monitoramento para ${targets.length} targets:`);
-
-  for (const target of targets) {
-    startMonitoring(target.id, target.url, target.checkInterval);
-
-    console.log(`✅ [${target.name}] Monitorando ${target.url} a cada ${target.checkInterval}s`);
-  }
-
-  console.log('\n✅ Monitoramento restaurado com sucesso!\n');
-}
-
-export const TargetService = {
-  async create(data: { name: string; url: string; checkInterval: number }) {
-    const newTarget = await prisma.target.create({
-      data: {
-        name: data.name,
-        url: data.url,
-        checkInterval: data.checkInterval,
-      },
-    });
-
-    startMonitoring(newTarget.id, newTarget.url, newTarget.checkInterval);
-
-    return newTarget;
-  },
-
-  async list() {
-    return await prisma.target.findMany();
-  },
-
-  async getById(id: string) {
-    return await prisma.target.findUnique({
-      where: { id },
-      include: { statusEntries: true },
-    });
-  },
-};
+export default startMonitoring;

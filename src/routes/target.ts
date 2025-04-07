@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { RequestHandler } from 'express';
-import { TargetService } from '../services/targetService';
+import { targetService } from '../modules/index';
 
 const router = Router();
 
@@ -18,7 +18,7 @@ const createTarget: RequestHandler = async (req, res): Promise<void> => {
   }
 
   try {
-    const target = await TargetService.create({ name, url, checkInterval });
+    const target = await targetService.create({ name, url, checkInterval });
     res.status(201).json(target);
   } catch (error: unknown) {
     console.error('Error creating target:', error);
@@ -29,14 +29,14 @@ const createTarget: RequestHandler = async (req, res): Promise<void> => {
 router.post('/create', createTarget);
 
 const listTargets: RequestHandler = async (req, res): Promise<void> => {
-  const targets = await TargetService.list();
+  const targets = await targetService.list();
   res.json(targets);
 };
 
 router.get('/list', listTargets);
 
 const getStatus: RequestHandler = async (req, res): Promise<void> => {
-  const target = await TargetService.getById(req.params.id);
+  const target = await targetService.getById(req.params.id);
   if (!target) {
     res.status(404).json({ error: 'Target not found' });
     return;
@@ -53,7 +53,7 @@ const getStatus: RequestHandler = async (req, res): Promise<void> => {
 router.get('/:id/status', getStatus);
 
 const getHistory: RequestHandler = async (req, res): Promise<void> => {
-  const target = await TargetService.getById(req.params.id);
+  const target = await targetService.getById(req.params.id);
 
   if (!target) {
     res.status(404).json({ error: 'Target not found' });
@@ -70,7 +70,7 @@ const getHistory: RequestHandler = async (req, res): Promise<void> => {
 router.get('/:id/history', getHistory);
 
 const getUptime: RequestHandler = async (req, res): Promise<void> => {
-  const target = await TargetService.getById(req.params.id);
+  const target = await targetService.getById(req.params.id);
   if (!target) {
     res.status(404).json({ error: 'Target not found' });
     return;

@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import targetRoutes from './routes/target';
-import { restoreMonitoringFromDatabase } from './services/targetService';
+import { restoreMonitoringFromDatabase } from './modules/index';
 
 dotenv.config();
 const app = express();
