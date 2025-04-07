@@ -1,11 +1,13 @@
-<h1>Guepard Health Check</h1>
+<h2>Guepard Health Check</h2>
 
-<h3>👻 Descrição</h3>
+### 👻 Descrição
 
 Esse modulo do Guepard é uma API que fornece dados atuais de um endpoint cadastrado, a ideia é poder visualizar o status de conexão e dados a mais sobre ele.
 (Em inicio de projeto)
 
-<h3>🪡 Endpoints</h3>
+---
+
+### 🪡 Endpoints
 
 - `/targets/create`
 - `/targets/list`
@@ -13,20 +15,11 @@ Esse modulo do Guepard é uma API que fornece dados atuais de um endpoint cadast
 - `/targets/:id/history`
 - `/targets/:id/uptime`
 
-<h3>🧻 Visualização</h3>
+---
+
+### 🧻 Visualização
 
 ![Preview](https://github.com/user-attachments/assets/c5a2bd75-c571-4864-96b4-c02ae498ad2d)
-
-<h3>🚶‍♂️ Andamento</h3>
-
-Próximos passos:
-
-- Melhorar o controle e a gestão dos jobs
-- Autenticação JWT
-- Implementar testes automatizados
-- Adicionar alertas e notificações
-- Documentar a API
-- Git hub actions para deploy
 
 ---
 
@@ -108,6 +101,9 @@ Próximos passos:
 
 ## ✨ Próximos Passos Sugeridos
 
+- [ ] Documentar a API
+- [ ] Adicionar alertas e notificações
+- [ ] Melhorar o controle e a gestão dos jobs
 - [ ] Adicionar autenticação (JWT ou API Key)
 - [ ] Adicionar testes automatizados (unitários e integração)
 - [ ] Criar painel web para visualização dos targets
