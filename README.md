@@ -2,8 +2,8 @@
 
 ### 👻 Descrição
 
-Esse modulo do Guepard é uma API que fornece dados atuais de um endpoint cadastrado, a ideia é poder visualizar o status de conexão e dados a mais sobre ele.
-(Em inicio de projeto)
+Esse módulo do Guepard é uma API que fornece dados atuais de um endpoint cadastrado, permitindo visualizar o status de conexão e dados adicionais sobre ele.  
+Inclui agora uma rota `/health` para monitoramento da saúde da API, que indica se o banco de dados está disponível ou se o sistema está rodando em modo degradado.
 
 ---
 
@@ -14,6 +14,7 @@ Esse modulo do Guepard é uma API que fornece dados atuais de um endpoint cadast
 - `/targets/:id/status`
 - `/targets/:id/history`
 - `/targets/:id/uptime`
+- `/health`
 
 ---
 
@@ -38,6 +39,7 @@ Esse modulo do Guepard é uma API que fornece dados atuais de um endpoint cadast
 - [x] Monitoramento periódico com `node-cron`
 - [x] Registro de histórico de status de cada URL
 - [x] Limite de 10 logs por target (últimos 10 registros)
+- [x] Rota `/health` para checagem do status da API e do banco (retorna `ok` ou `degraded`)
 
 ---
 
@@ -56,6 +58,7 @@ Esse modulo do Guepard é uma API que fornece dados atuais de um endpoint cadast
 - [x] Prisma como ORM com schema versionado
 - [x] Persistência de targets e histórico de monitoramento
 - [x] Função de boot para reiniciar monitoramento após restart
+- [x] Modo degradado da API implementado quando banco está indisponível (bloqueio parcial de rotas)
 
 ---
 
