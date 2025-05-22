@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import targetRoutes from './routes/target';
 import { restoreMonitoringFromDatabase } from './modules/index';
 import { isDatabaseConnected } from './db/checkDatabase';
+import { handleNotFound, handleError } from './middlewares/responseHandler';
 
 dotenv.config();
 
@@ -21,13 +22,15 @@ export async function startServer() {
   app.get('/health', (req, res) => {
     if (dbConnected) {
       res.status(200).json({ status: 'ok', database: true });
+    } else {
+      res.status(503).json({ status: 'degraded', database: false });
     }
-
-    res.status(503).json({ status: 'degraded', database: false });
   });
 
   if (!dbConnected) {
     console.error('❌ Banco de dados indisponível. API rodando em modo limitado.');
+
+    app.use(handleNotFound);
 
     return app.listen(PORT, () => {
       console.log(`⚠️ Server em modo degradado na porta ${PORT}`);
@@ -37,6 +40,9 @@ export async function startServer() {
   app.use('/targets', targetRoutes);
 
   await restoreMonitoringFromDatabase();
+
+  app.use(handleNotFound);
+  app.use(handleError);
 
   app.listen(PORT, () => {
     console.log(`✅ Server is running on port ${PORT}`);
