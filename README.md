@@ -102,6 +102,15 @@ Inclui agora uma rota `/health` para monitoramento da saúde da API, que indica 
 
 ---
 
+### ⚙️ Middleware de Tratamento de Erros
+
+- [x] Middleware centralizado para capturar erros não tratados nas rotas
+- [x] Retorna respostas padronizadas com status e mensagens claras para o cliente
+- [x] Evita crashes da aplicação e previne múltiplos envios de resposta (`Cannot set headers after they are sent`)
+- [x] Loga erros no servidor para facilitar debug
+
+---
+
 ## ✨ Próximos Passos Sugeridos
 
 - [ ] Documentar a API
