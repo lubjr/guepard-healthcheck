@@ -18,6 +18,13 @@ Inclui agora uma rota `/health` para monitoramento da saúde da API, que indica 
 
 ---
 
+### 🛡️ Rate Limiting
+
+A API aplica um middleware de limite de requisições (rate limiting) em rotas críticas (como `/targets`) para evitar abusos e garantir estabilidade.
+Atualmente, cada IP pode realizar até **100 requisições a cada 15 minutos**.
+
+---
+
 ### 🧻 Visualização
 
 ![Preview](https://github.com/user-attachments/assets/c5a2bd75-c571-4864-96b4-c02ae498ad2d)

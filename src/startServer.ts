@@ -4,6 +4,7 @@ import targetRoutes from './routes/target';
 import { restoreMonitoringFromDatabase } from './modules/index';
 import { isDatabaseConnected } from './db/checkDatabase';
 import { handleNotFound, handleError } from './middlewares/responseHandler';
+import { rateLimiter } from './middlewares/rateLimiter';
 
 dotenv.config();
 
@@ -37,7 +38,7 @@ export async function startServer() {
     });
   }
 
-  app.use('/targets', targetRoutes);
+  app.use('/targets', rateLimiter, targetRoutes);
 
   await restoreMonitoringFromDatabase();
 
